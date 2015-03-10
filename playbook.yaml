@@ -1,0 +1,29 @@
+- hosts: 127.0.0.1
+  connection: local
+  sudo: False
+
+  tasks:
+  - yum: name=* state=latest
+    sudo: True
+  - yum: name={{ item }} state=latest
+    sudo: True
+    with_items:
+      - git
+      - htop
+      - libvirt
+      - nmap
+      - qemu-kvm
+      - tcpdump
+      - terminator
+      - terminus-fonts
+      - vim
+  - service: name=firewalld enabled=no state=stopped
+    sudo: True
+  - service: name=sshd enabled=yes state=started
+    sudo: True
+  - get_url: url=http://git.grml.org/f/grml-etc-core/etc/zsh/zshrc dest=~/.zshrc mode=0600
+  - copy: src=files/tmux.conf dest=~/.tmux.conf mode=0600
+  - git: repo=git://git.openstack.org/openstack-dev/devstack
+         dest=~/devstack
+         accept_hostkey=True
+  - copy: src=files/local.conf dest=~/devstack/local.conf
